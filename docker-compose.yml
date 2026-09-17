@@ -7,6 +7,10 @@ services:
       - "8000:8000"
     environment:
       - PYTHONUNBUFFERED=1
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    env_file:
+      - .env
 
   frontend:
     build:
@@ -14,5 +18,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
     depends_on:
       - backend

@@ -13,10 +13,11 @@ interface TopNavProps {
 }
 
 export const models = [
-  { id: "Syntrix v4.2", name: "Syntrix v4.2", description: "Flagship multimodal reasoning engine (Default)", tag: "Pro" },
-  { id: "gemini-2.5-pro", name: "Gemini 2.5 Pro", description: "Deep thinking & 2M context window", tag: "Fast & Deep" },
-  { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash", description: "Ultra-fast response with high accuracy", tag: "Turbo" },
-  { id: "claude-3-5-sonnet", name: "Claude 3.5 Sonnet", description: "Superior coding & nuance generation", tag: "Code" },
+  { id: "Syntrix v4.2", name: "Syntrix v4.2 (GPT-4o)", description: "Flagship multimodal intelligence (OpenAI GPT-4o)", tag: "Pro" },
+  { id: "GPT-4o", name: "GPT-4o", description: "High-intelligence flagship model for complex tasks", tag: "Smart" },
+  { id: "GPT-4o mini", name: "GPT-4o mini", description: "Fast, lightweight model for everyday tasks", tag: "Fast" },
+  { id: "o3-mini", name: "o3-mini", description: "Advanced reasoning & deep thinking for STEM and code", tag: "Reasoning" },
+  { id: "gemini-2.5-pro", name: "Gemini 2.5 Pro", description: "2M context window & deep reasoning", tag: "Google" },
 ];
 
 export default function TopNav({

@@ -9,10 +9,10 @@ interface SettingsModalProps {
 }
 
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
-  const [apiKey, setApiKey] = useState("");
+  const [openaiKey, setOpenaiKey] = useState("");
+  const [geminiKey, setGeminiKey] = useState("");
   const [pineconeKey, setPineconeKey] = useState("");
   const [temperature, setTemperature] = useState(0.7);
-  const [streamSpeed, setStreamSpeed] = useState("fast");
 
   if (!isOpen) return null;
 
@@ -33,36 +33,37 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           </div>
           <div>
             <h3 className="text-lg font-bold text-white">System Settings</h3>
-            <p className="text-xs text-slate-400">Configure AI inference, API keys, and RAG pipelines</p>
+            <p className="text-xs text-slate-400">Configure AI inference, API keys, and model parameters</p>
           </div>
         </div>
 
         <div className="space-y-4 text-xs">
-          {/* API Keys */}
+          {/* OpenAI API Key */}
           <div className="space-y-2">
             <label className="text-slate-300 font-semibold flex items-center gap-1.5">
               <Key className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Google Gemini API Key</span>
+              <span>OpenAI API Key (Primary)</span>
             </label>
             <input
               type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="AIzaSy..."
+              value={openaiKey}
+              onChange={(e) => setOpenaiKey(e.target.value)}
+              placeholder="sk-proj-..."
               className="w-full bg-[#161F30] border border-white/10 rounded-xl px-3 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500/50"
             />
           </div>
 
+          {/* Google Gemini API Key */}
           <div className="space-y-2">
             <label className="text-slate-300 font-semibold flex items-center gap-1.5">
-              <Database className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Pinecone Vector DB API Key</span>
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Google Gemini API Key (Optional)</span>
             </label>
             <input
               type="password"
-              value={pineconeKey}
-              onChange={(e) => setPineconeKey(e.target.value)}
-              placeholder="pcsk_..."
+              value={geminiKey}
+              onChange={(e) => setGeminiKey(e.target.value)}
+              placeholder="AIzaSy..."
               className="w-full bg-[#161F30] border border-white/10 rounded-xl px-3 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500/50"
             />
           </div>

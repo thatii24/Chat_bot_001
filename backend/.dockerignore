@@ -7,9 +7,14 @@ env
 venv
 .venv
 .pytest_cache
+.mypy_cache
+.coverage
+htmlcov
 .git
 .gitignore
+.github
 .vscode
 .idea
+*.md
 .DS_Store
 Thumbs.db

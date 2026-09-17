@@ -1,207 +1,189 @@
-# 🚀 Production-Ready Gemini RAG Chatbot (Dockerized)
+# 🌐 Syntrix AI — Next-Gen Multimodal Chatbot
 
-A scalable, full-stack **Retrieval-Augmented Generation (RAG)** chatbot architecture powered by **Google Gemini API**, **Pinecone Vector Database**, **PostgreSQL**, and containerized with **Docker & Docker Compose**.
-
----
-
-## 📌 Table of Contents
-- [Overview](#-overview)
-- [Architecture & Workflow](#-architecture--workflow)
-  - [1. Data Ingestion Pipeline](#1-data-ingestion-pipeline)
-  - [2. RAG Chat Flow](#2-rag-chat-flow)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [Implementation Roadmap](#-implementation-roadmap)
-- [Environment Variables](#-environment-variables)
-- [Getting Started](#-getting-started)
-- [License](#-license)
+A production-ready, full-stack AI chatbot platform featuring a **futuristic dark glassmorphic UI**, real-time **Server-Sent Events (SSE) streaming**, **OpenAI & Google Gemini** multi-model reasoning, **DALL-E 3** image generation, and **Docker** orchestration.
 
 ---
 
-## 📖 Overview
+## 📸 Interface Preview & Features
 
-This repository contains the architecture, configuration, and implementation blueprint for deploying an enterprise-grade AI chatbot capable of ingesting unstructured knowledge documents and performing context-aware, low-latency conversational responses using Gemini text generation models.
-
-### Key Capabilities
-- **Semantic Search**: Vector embeddings via `text-embedding-004` stored in Pinecone.
-- **Context-Aware Streaming**: Conversational generation with `gemini-2.5-flash` / `gemini-2.5-pro` with real-time UI streaming.
-- **Relational History & Sessions**: Multi-session management & chat history powered by PostgreSQL & Prisma ORM.
-- **Production-Grade Containerization**: Zero-drift multi-container environment orchestrated via Docker Compose.
+- **Futuristic Glassmorphic Interface**: Deep obsidian theme with ambient radial glows, frosted glass panels, and an animated 3D glowing centerpiece orb.
+- **Real-Time Token Streaming**: Low-latency sub-second response streaming from FastAPI backend to the Next.js frontend via Server-Sent Events (SSE).
+- **💡 Deep Think Reasoning Engine**: Multi-step chain-of-thought accordion displaying the model's live reasoning process.
+- **🖼 Image Generator**: Integrated with DALL-E 3 for high-resolution visual art generation and cinematic prompt styling.
+- **🎬 Video Storyboard Generator**: Generates 3-scene camera angles, timecodes, and directorial prompts.
+- **💻 Dev Assistant**: Automated code refactoring, AST explanations, and bug detection.
+- **Multi-Model Support**: Switch seamlessly between **GPT-4o**, **GPT-4o mini**, **o3-mini**, and **Gemini 2.5 Pro**.
+- **Dockerized Architecture**: Fully containerized multi-tier setup with production-grade Next.js standalone runner and FastAPI backend.
 
 ---
 
-## 🏗 Architecture & Workflow
+## 🏗 Architecture & Tech Stack
 
-### 1. Data Ingestion Pipeline
 ```mermaid
-flowchart LR
-    A[Admin / Documents] -->|Upload Text / PDF| B[Next.js Backend API\n/api/ingest]
-    B -->|Generate Embeddings| C[Google Gemini API\ntext-embedding-004]
-    C -->|Vector Chunks| B
-    B -->|Upsert Vectors + Metadata| D[(Pinecone Vector DB)]
+flowchart TD
+    subgraph Client ["Frontend (Next.js 15 / React 19 / Tailwind CSS)"]
+        UI[Glassmorphic UI]
+        Sidebar[Sidebar & Session Manager]
+        StreamingClient[SSE Stream Reader]
+        UI --> StreamingClient
+    end
+
+    subgraph Backend ["Backend (FastAPI / Python 3.11)"]
+        API[FastAPI Router /api/chat/stream]
+        OpenAIService[OpenAI Service]
+        GeminiService[Gemini Service]
+        API --> OpenAIService
+        API --> GeminiService
+    end
+
+    subgraph CloudAI ["AI Model Providers"]
+        OpenAI["OpenAI (GPT-4o, o3-mini, DALL-E 3)"]
+        Gemini["Google Gemini (2.5 Pro / Flash)"]
+        OpenAIService --> OpenAI
+        GeminiService --> Gemini
+    end
+
+    StreamingClient <-->|SSE Stream :8000| API
 ```
-
-### 2. RAG Chat Flow
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as User (Frontend)
-    participant API as Next.js API (/api/chat)
-    participant DB as PostgreSQL (Docker)
-    participant Embed as Gemini Embedding API
-    participant Pinecone as Pinecone Vector DB
-    participant LLM as Gemini Chat Model
-
-    User->>API: Send Message / Prompt
-    API->>Embed: Embed Query (text-embedding-004)
-    Embed-->>API: Vector Representation
-    API->>Pinecone: Semantic Vector Query (Top K)
-    Pinecone-->>API: Relevant Document Chunks & Metadata
-    API->>DB: Fetch Chat History & Session Context
-    DB-->>API: Previous Messages
-    API->>LLM: Stream Request (System Prompt + Retrieved Context + History + Query)
-    LLM-->>User: Real-Time Contextual Response Stream
-    API->>DB: Persist User Message & Assistant Response
-```
-
----
-
-## 🛠 Tech Stack
 
 | Layer | Technology | Purpose |
 | :--- | :--- | :--- |
-| **Frontend & Backend** | [Next.js](https://nextjs.org/) (React 19 / App Router) | Unified SSR/CSR frontend and secure backend API endpoints. |
-| **Styling** | [Tailwind CSS](https://tailwindcss.com/) | Modern, responsive, utility-first UI styling. |
-| **Vector Database** | [Pinecone](https://www.pinecone.io/) | Managed cloud vector database for ultra-fast semantic similarity searches. |
-| **Relational Database**| [PostgreSQL](https://www.postgresql.org/) + [Prisma ORM](https://www.prisma.io/) | App state, user authentication, chat sessions, and message persistence. |
-| **AI Embeddings** | `text-embedding-004` | Google GenAI SDK embedding model for converting unstructured chunks to vectors. |
-| **AI Generation** | `gemini-2.5-flash` / `gemini-2.5-pro` | High-speed, long-context text generation with streaming capabilities. |
-| **Containerization** | [Docker](https://www.docker.com/) & Docker Compose | Multi-container setup ensuring parity between development and production. |
+| **Frontend** | [Next.js 15](https://nextjs.org/) (React 19 App Router) | SSR/CSR UI, responsive glassmorphic components, audio input |
+| **Styling** | [Tailwind CSS](https://tailwindcss.com/) + Custom CSS3 | Dark obsidian palette, radial glows, 3D floating orb sphere |
+| **Icons** | [Lucide React](https://lucide.dev/) | Clean modern icon library |
+| **Backend** | [FastAPI](https://fastapi.tiangolo.com/) + [Uvicorn](https://www.uvicorn.org/) | High-performance async Python backend with SSE streaming |
+| **AI SDKs** | `openai` & `google-genai` | Multi-provider intelligence, reasoning chains, and image gen |
+| **Containerization** | [Docker](https://www.docker.com/) & Docker Compose | Multi-container development & production orchestration |
 
 ---
 
 ## 📁 Project Structure
 
 ```text
-gemini-rag-chatbot/
-├── .dockerignore               # Docker build ignore rules
-├── .env.example                # Template for required environment secrets
-├── docker-compose.yml          # Container orchestration (App + PostgreSQL)
-├── Dockerfile                  # Production multi-stage Docker build for Next.js
-├── package.json                # Project dependencies and run scripts
-├── prisma/
-│   └── schema.prisma           # Relational schema (Users, ChatSessions, Messages)
-├── src/
-│   ├── app/                    
-│   │   ├── api/
-│   │   │   ├── chat/
-│   │   │   │   └── route.ts    # Main RAG chat endpoint (Retrieval + Generation + Streaming)
-│   │   │   └── ingest/
-│   │   │       └── route.ts    # Document ingestion and vector upsert endpoint
-│   │   ├── chat/
-│   │   │   └── [id]/
-│   │   │       └── page.tsx    # Dynamic chat session UI
-│   │   ├── layout.tsx          # Root application layout
-│   │   └── page.tsx            # Landing / New Chat entrypoint
-│   ├── components/             
-│   │   └── ChatInterface.tsx   # Streaming chat interface & input components
-│   ├── lib/                    
-│   │   ├── db.ts               # Prisma client singleton
-│   │   ├── gemini.ts           # Google GenAI SDK client & configuration
-│   │   └── pinecone.ts         # Pinecone index client
-│   └── types/                  # TypeScript interface declarations
-└── README.md
+Chat_bot_001/
+├── backend/
+│   ├── services/
+│   │   ├── openai_service.py    # OpenAI streaming, DALL-E 3, & code assistant
+│   │   └── gemini_service.py    # Google Gemini streaming & search grounding
+│   ├── app.py                   # FastAPI routes & CORS setup
+│   ├── Dockerfile               # Python 3.11 container definition
+│   ├── requirements.txt         # Python dependencies
+│   └── .dockerignore            # Backend build ignore rules
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── globals.css      # Design system, 3D orb, & glassmorphism
+│   │   │   ├── layout.tsx       # Root layout & dark theme metadata
+│   │   │   └── page.tsx         # Main chat stage & view coordinator
+│   │   ├── components/
+│   │   │   ├── Sidebar.tsx      # Syntrix branding, features, & history
+│   │   │   ├── TopNav.tsx       # Model dropdown & navigation
+│   │   │   ├── WelcomeView.tsx  # Hero 3D orb & prompt box with tools
+│   │   │   ├── ChatInterface.tsx# Streaming chat & Deep Think accordion
+│   │   │   ├── UpgradeModal.tsx # Pro subscription tier modal
+│   │   │   ├── SettingsModal.tsx# API keys & temperature settings
+│   │   │   └── HelpModal.tsx    # Documentation & tips modal
+│   │   └── lib/
+│   │       └── api.ts           # SSE streaming reader client
+│   ├── Dockerfile               # Next.js multi-stage production build
+│   ├── package.json             # Frontend dependencies
+│   ├── tailwind.config.ts       # Tailwind CSS configuration
+│   └── .dockerignore            # Frontend build ignore rules
+├── .dockerignore                # Root Docker ignore rules
+├── .gitignore                   # Root Git ignore rules
+├── .env.example                 # Environment variables template
+├── docker-compose.yml           # Multi-service container orchestration
+└── README.md                    # Project documentation
 ```
 
 ---
 
-## 🗺 Implementation Roadmap
+## ⚙ Environment Configuration
 
-- [x] **Phase 1: Setup & Dockerization**
-  - Initialize Next.js project with TypeScript and Tailwind CSS.
-  - Create multi-stage `Dockerfile` and `docker-compose.yml` for local & production containers.
-  - Setup containerized PostgreSQL service with persistent volume mapping.
+Create a `.env` file in the root directory (or copy from `.env.example`):
 
-- [ ] **Phase 2: Knowledge Ingestion (Pinecone)**
-  - Configure Pinecone cloud index with cosine similarity metric.
-  - Implement `/api/ingest` for chunking text, generating embeddings (`text-embedding-004`), and upserting vectors with metadata.
+```bash
+cp .env.example .env
+```
 
-- [ ] **Phase 3: Database & Backend Foundation**
-  - Define `schema.prisma` models for `User`, `ChatSession`, and `ChatMessage`.
-  - Execute Prisma migrations against the containerized PostgreSQL instance.
-  - Create database access singletons in `src/lib/db.ts`.
-
-- [ ] **Phase 4: The RAG Chat Engine**
-  - Implement `/api/chat/route.ts` pipeline:
-    1. Vectorize query.
-    2. Query Pinecone for top-$k$ contextual matches.
-    3. Retrieve chronological message history from PostgreSQL.
-    4. Construct grounded prompt with system instructions.
-    5. Stream response via Google GenAI SDK (`gemini-2.5-flash`).
-
-- [ ] **Phase 5: Frontend UI Construction**
-  - Build responsive chat interface with sidebar session switcher.
-  - Implement real-time token streaming with Markdown and syntax highlighting support.
-
-- [ ] **Phase 6: Production Deployment**
-  - Finalize production Docker image.
-  - Deploy containers to cloud hosting (AWS ECS, Google Cloud Run, or VPS).
-
----
-
-## ⚙ Environment Variables
-
-Create a `.env` file in the root directory:
+Edit `.env` with your API keys:
 
 ```env
-# Google Gemini API
+# OpenAI API Key (Primary)
+OPENAI_API_KEY=sk-proj-your_openai_api_key_here
+
+# Google Gemini API Key (Optional)
 GEMINI_API_KEY=your_gemini_api_key_here
 
-# Pinecone Vector Database
-PINECONE_API_KEY=your_pinecone_api_key_here
-PINECONE_INDEX_NAME=gemini-rag-index
-PINECONE_ENVIRONMENT=us-east-1
+# Frontend Configuration
+NEXT_PUBLIC_API_URL=http://localhost:8000
 
-# PostgreSQL & Prisma
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/rag_chatbot?schema=public
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=rag_chatbot
-
-# Application
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+# Backend Configuration
+PORT=8000
+HOST=0.0.0.0
 ```
 
 ---
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- [Docker](https://www.docker.com/) & Docker Compose installed
-- [Node.js](https://nodejs.org/) (v20+ recommended)
-- Google Gemini API Key
-- Pinecone API Key & Index
+### Option 1: Run with Docker (Recommended)
 
-### 1. Clone & Configure
+1. Make sure **Docker Desktop** is running.
+2. Build and start the services from the project root:
+
 ```bash
-git clone <your-repo-url>
-cd Chat_bot_001
-cp .env.example .env
+docker compose up --build -d
 ```
 
-### 2. Start Services with Docker Compose
+3. Access the application:
+   - **Frontend UI**: [http://localhost:3000](http://localhost:3000)
+   - **FastAPI Backend**: [http://localhost:8000](http://localhost:8000)
+   - **Interactive API Docs (Swagger)**: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+4. To stop the containers:
 ```bash
-docker-compose up -d
+docker compose down
 ```
 
-### 3. Run Database Migrations
+---
+
+### Option 2: Run Locally (Without Docker)
+
+#### 1. Start the FastAPI Backend
 ```bash
-npx prisma migrate dev --name init
+cd backend
+python -m venv .venv
+# On Windows:
+.venv\Scripts\activate
+# On macOS/Linux:
+# source .venv/bin/activate
+
+pip install -r requirements.txt
+uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### 4. Access Application
-- Web UI: `http://localhost:3000`
-- PostgreSQL: `localhost:5432`
+#### 2. Start the Next.js Frontend
+In a separate terminal window:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 🔌 API Reference
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/` | Service root and API key verification status |
+| `GET` | `/api/health` | Health check endpoint |
+| `POST` | `/api/chat/stream` | Server-Sent Events (SSE) real-time streaming endpoint |
+| `POST` | `/api/generate/image` | DALL-E 3 image generation & visual prompt expander |
+| `POST` | `/api/generate/video` | Cinematic multi-scene storyboard generator |
+| `POST` | `/api/tools/code` | Dev assistant code debugging & refactoring engine |
 
 ---
 
