@@ -1,42 +1,192 @@
-import { Bot, Sparkles, Send } from "lucide-react";
+"use client";
+
+import React, { useState } from "react";
+import Sidebar from "@/components/Sidebar";
+import TopNav from "@/components/TopNav";
+import WelcomeView from "@/components/WelcomeView";
+import ChatInterface, { Message } from "@/components/ChatInterface";
+import UpgradeModal from "@/components/UpgradeModal";
+import SettingsModal from "@/components/SettingsModal";
+import HelpModal from "@/components/HelpModal";
 
 export default function Home() {
+  const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+  const [selectedModel, setSelectedModel] = useState("Syntrix v4.2");
+  const [activeNav, setActiveNav] = useState("Dashboard");
+
+  // Modals state
+  const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+
+  // Chat conversation state
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleNewChat = () => {
+    setCurrentChatId(null);
+    setMessages([]);
+  };
+
+  const handleSelectChat = (id: string) => {
+    setCurrentChatId(id);
+    // Populate sample conversation for existing chats
+    if (id === "chat-1") {
+      setMessages([
+        {
+          id: "m-1",
+          role: "user",
+          content: "Can you help me adjust the lighting and background reflections for this futuristic visual concept?",
+          timestamp: "2h ago",
+        },
+        {
+          id: "m-2",
+          role: "assistant",
+          content: "Here are 3 key visual adjustments to enhance the atmosphere:\n\n1. **Subsurface Scattering & Ambient Occlusion**: Increase cyan point light sources behind the subject to generate crisp edge highlights.\n2. **Volumetric Fog & Bloom**: Soften harsh specular glares with a 15% blur radial pass.\n3. **Color Balance**: Shift shadow undertones from pitch black to deep obsidian (#0B0E14) for cinematic depth.",
+          timestamp: "2h ago",
+          deepThink: {
+            thinkingSteps: [
+              "Analyzing visual query parameters and artistic style...",
+              "Evaluating contrast, lighting curves, and chromatic balance...",
+              "Generating concrete aesthetic recommendations...",
+            ],
+          },
+        },
+      ]);
+    } else {
+      setMessages([
+        {
+          id: "m-init-1",
+          role: "user",
+          content: `Opening chat: ${id}`,
+          timestamp: "Just now",
+        },
+        {
+          id: "m-init-2",
+          role: "assistant",
+          content: `Loaded conversation session ${id}. How would you like to proceed with Syntrix ${selectedModel}?`,
+          timestamp: "Just now",
+        },
+      ]);
+    }
+  };
+
+  const handleSelectFeature = (featureName: string) => {
+    handleNewChat();
+    handleSendMessage(`Explore ${featureName} workflows with AI assistance.`);
+  };
+
+  const handleSelectFeatureCard = (featureTitle: string, prompt: string) => {
+    handleSendMessage(prompt);
+  };
+
+  const handleSendMessage = (text: string, options?: { deepThink?: boolean; tools?: string[] }) => {
+    if (!text.trim()) return;
+
+    const userMessage: Message = {
+      id: `usr-${Date.now()}`,
+      role: "user",
+      content: text,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setCurrentChatId("active-session");
+    setIsLoading(true);
+
+    // Simulate AI response with deep reasoning steps and streaming feel
+    setTimeout(() => {
+      let responseText = "";
+      let thinkingSteps: string[] = [];
+      let sources: { title: string; score: number }[] = [];
+
+      if (options?.deepThink) {
+        thinkingSteps = [
+          "Parsing user intent and semantic context...",
+          "Retrieving relevant embeddings from Pinecone knowledge base...",
+          "Applying chain-of-thought synthesis and validating structural correctness...",
+          "Drafting response with optimal clarity and high precision...",
+        ];
+      }
+
+      if (options?.tools?.includes("pinecone-rag")) {
+        sources = [
+          { title: "knowledge_base_rag_v2.pdf", score: 0.94 },
+          { title: "gemini_architecture_docs.md", score: 0.89 },
+        ];
+      }
+
+      if (text.toLowerCase().includes("image") || text.toLowerCase().includes("city") || text.toLowerCase().includes("visual")) {
+        responseText = `Here is the conceptual breakdown for your visual request:\n\n✨ **Prompt Formulation:**\n> *"A hyper-detailed futuristic metropolis bathed in iridescent cyan and emerald neon hues, reflections cascading across wet obsidian asphalt, cinematic anamorphic lens, 8k resolution."*\n\n🎨 **Composition Guidelines:**\n- **Color Palette:** Obsidian (#0B0E14), Neon Cyan (#22D3EE), Vibrant Emerald (#10B981)\n- **Lighting Ratio:** 3:1 high-contrast directional key lighting\n- **Focal Length:** 35mm wide-angle for expansive scale.`;
+      } else if (text.toLowerCase().includes("code") || text.toLowerCase().includes("rag") || text.toLowerCase().includes("assistant")) {
+        responseText = `### Next.js RAG Pipeline Implementation\n\nHere is how you connect Google Gemini 2.5 with Pinecone Vector DB for context-aware responses:\n\n\`\`\`typescript\nimport { GoogleGenAI } from "@google/genai";\nimport { Pinecone } from "@pinecone-database/pinecone";\n\nconst ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });\nconst pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });\n\nexport async function queryRAG(userQuery: string) {\n  // 1. Generate query embedding\n  const embedding = await ai.models.embedContent({\n    model: "text-embedding-004",\n    content: userQuery,\n  });\n\n  // 2. Query Pinecone for top matches\n  const index = pc.index("gemini-rag-index");\n  const queryResponse = await index.query({\n    vector: embedding.embedding.values,\n    topK: 3,\n    includeMetadata: true,\n  });\n\n  return queryResponse.matches;\n}\n\`\`\`\n\n✅ This handles vector retrieval with sub-50ms latency.`;
+      } else {
+        responseText = `I'm ready to assist you with **"${text}"** using **${selectedModel}**.\n\nHere are some actions we can take:\n- **Analyze & Expand**: Break this task down into structured milestones.\n- **Execute**: Generate production-ready assets, code, or documentation.\n- **Verify**: Cross-check with ground knowledge documents and search benchmarks.\n\nLet me know how you'd like to proceed!`;
+      }
+
+      const assistantMessage: Message = {
+        id: `ai-${Date.now()}`,
+        role: "assistant",
+        content: responseText,
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        deepThink: options?.deepThink ? { thinkingSteps } : undefined,
+        sources: sources.length > 0 ? sources : undefined,
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+      setIsLoading(false);
+    }, 1200);
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-24 bg-gradient-to-b from-slate-900 to-slate-950">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm flex">
-        <div className="flex items-center gap-2 font-semibold text-emerald-400">
-          <Bot className="w-6 h-6" />
-          <span>Gemini RAG Chatbot</span>
-        </div>
-        <div className="flex items-center gap-1.5 text-xs bg-slate-800/80 border border-slate-700 px-3 py-1 rounded-full text-slate-300">
-          <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
-          <span>Next.js + TypeScript + Tailwind</span>
-        </div>
-      </div>
+    <div className="flex h-screen w-screen bg-[#0B0E14] text-slate-100 overflow-hidden relative font-sans select-none">
+      {/* Ambient background glows matching the screenshot */}
+      <div className="ambient-glow-top-right"></div>
+      <div className="ambient-glow-center"></div>
 
-      <div className="relative flex flex-col items-center justify-center text-center max-w-2xl my-auto">
-        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-          Conversational AI with RAG
-        </h1>
-        <p className="mt-4 text-slate-400 text-base md:text-lg">
-          Powered by Google Gemini, Pinecone Vector DB, and PostgreSQL.
-        </p>
+      {/* Sidebar Navigation */}
+      <Sidebar
+        currentChatId={currentChatId}
+        onSelectChat={handleSelectChat}
+        onNewChat={handleNewChat}
+        onOpenUpgrade={() => setIsUpgradeOpen(true)}
+        onSelectFeature={handleSelectFeature}
+      />
 
-        <div className="w-full mt-8 flex items-center gap-2 bg-slate-900/90 border border-slate-800 rounded-xl p-2 shadow-2xl focus-within:border-emerald-500/50 transition">
-          <input
-            type="text"
-            placeholder="Ask anything or upload documents..."
-            className="flex-1 bg-transparent px-4 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none"
-          />
-          <button className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-medium p-2.5 rounded-lg transition">
-            <Send className="w-4 h-4" />
-          </button>
+      {/* Main Content Area Frame */}
+      <main className="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
+        {/* Top Navbar */}
+        <TopNav
+          selectedModel={selectedModel}
+          onSelectModel={setSelectedModel}
+          activeNav={activeNav}
+          setActiveNav={setActiveNav}
+          onOpenSettings={() => setIsSettingsOpen(true)}
+          onOpenHelp={() => setIsHelpOpen(true)}
+        />
+
+        {/* Dynamic Center Stage: Welcome View OR Active Chat */}
+        <div className="flex-1 flex flex-col overflow-hidden relative">
+          {messages.length === 0 ? (
+            <WelcomeView
+              onSendMessage={handleSendMessage}
+              onSelectFeatureCard={handleSelectFeatureCard}
+            />
+          ) : (
+            <ChatInterface
+              messages={messages}
+              isLoading={isLoading}
+              onSendMessage={handleSendMessage}
+              selectedModel={selectedModel}
+            />
+          )}
         </div>
-      </div>
+      </main>
 
-      <footer className="text-xs text-slate-600">
-        Dockerized Full-Stack Architecture
-      </footer>
-    </main>
+      {/* Interactive Modals */}
+      <UpgradeModal isOpen={isUpgradeOpen} onClose={() => setIsUpgradeOpen(false)} />
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+    </div>
   );
 }
